@@ -1,2 +1,2 @@
-# board
-generic board game
+# Generic Board Game
+work in progress
