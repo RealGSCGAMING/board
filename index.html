@@ -10,6 +10,7 @@
         overflow: hidden;
         height: 100vh;
         margin: 0;
+        font-family: Arial, sans-serif;
       }
 
       #left-panel {
@@ -22,15 +23,30 @@
       }
 
       #roll-button {
-        margin: 20px 0;
-        padding: 15px;
-        font-size: 18px;
+        font-size: 2em;
+        padding: 20px 40px;
+        border-radius: 25px;
+        background-color: white;
+        color: black;
+        border: 2px solid black;
         cursor: pointer;
+        margin-top: 10px;
+        margin-left: 5px;
+        margin-right: 5px;
+      }
+
+      #roll-button:hover {
+        transform: scale(1.05);
       }
 
       #roll-result {
-        font-size: 22px;
-        margin-top: 15px;
+        padding: 20px;
+        border-radius: 15px;
+        background-color: white;
+        font-size: 1.5em;
+        border: 2px solid;
+        margin-top: 30px;
+        margin-bottom: 20px;
       }
 
       #board-container {
@@ -100,6 +116,7 @@
   <body>
     <div id="left-panel">
       <h2>Generic Board Game (WIP)</h2>
+      <p>Created by banana man</p>
       <button id="roll-button">Roll Die</button>
       <div id="roll-result"></div>
     </div>
