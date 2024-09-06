@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generic Board Game</title>
+    <link rel="icon" href="https://freepngimg.com/thumb/dice/2-2-dice-png-image-thumb.png" type="image/png">
     <style>
       body {
         display: flex;
@@ -24,7 +25,8 @@
         align-items: center;
       }
 
-      #roll-button {
+      #roll-button,
+      #play-again-button {
         font-size: 2em;
         padding: 20px 40px;
         border-radius: 25px;
@@ -38,7 +40,8 @@
         transition: transform 0.1s;
       }
 
-      #roll-button:hover {
+      #roll-button:hover,
+      #play-again-button:hover {
         transform: scale(1.05);
       }
 
@@ -120,6 +123,14 @@
         opacity: 0.7;
         z-index: 5;
         display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      #play-again-button {
+        display: none;
+        /* Initially hidden */
       }
 
       #debug-input {
@@ -138,8 +149,10 @@
     </div>
     <div id="board-container">
       <div id="board"></div>
-      <div id="overlay"></div>
-      <div id="message">You Win</div>
+      <div id="overlay">
+        <div id="message">You Win <button id="play-again-button">Play Again</button>
+        </div>
+      </div>
     </div>
     <script>
       const boardSize = 50;
@@ -153,10 +166,14 @@
       const overlay = document.getElementById('overlay');
       const message = document.getElementById('message');
       const debugInput = document.getElementById('debug-input');
+      const playAgainButton = document.getElementById('play-again-button');
       let debugMode = false;
       let debugRoll = null;
+      let playAgainTimer = null;
 
       function generateBoard() {
+        board.innerHTML = ''; // Clear the existing board
+        spaces = [];
         let sandTiles = []; // Array to store sand tile positions
         // Generate board with sand and non-sand tiles
         for (let i = 0; i < boardSize * boardSize; i++) {
@@ -266,10 +283,12 @@
           spaces[path[currentPosition].row * boardSize + path[currentPosition].col].classList.remove('player');
           currentPosition++;
           if (currentPosition >= path.length) {
-            currentPosition = path.length - 1;
+            clearInterval(moveInterval);
+            displayWin();
+            return;
           }
           spaces[path[currentPosition].row * boardSize + path[currentPosition].col].classList.add('player');
-          if (spaces[path[currentPosition].row * boardSize + path[currentPosition].col].classList.contains('win')) {
+          if (currentPosition >= path.length - 1) {
             clearInterval(moveInterval);
             displayWin();
           }
@@ -304,14 +323,54 @@
       }
 
       function displayWin() {
-        overlay.style.display = 'block';
+        overlay.style.display = 'flex';
         message.style.display = 'block';
+        playAgainButton.style.display = 'inline-block';
+        startPlayAgainTimer();
       }
-      window.onload = function() {
+
+      function startPlayAgainTimer() {
+        let timeLeft = 2;
+        playAgainButton.textContent = `Play Again (${timeLeft})`;
+        playAgainButton.disabled = true;
+        playAgainButton.style.backgroundColor = "grey";
+        playAgainTimer = setInterval(() => {
+          timeLeft--;
+          if (timeLeft <= 0) {
+            clearInterval(playAgainTimer);
+            playAgainButton.textContent = "Play Again";
+            playAgainButton.disabled = false;
+            playAgainButton.style.backgroundColor = "";
+          } else {
+            playAgainButton.textContent = `Play Again (${timeLeft})`;
+          }
+        }, 1000);
+      }
+
+      function resetGame() {
+        // Clear the existing board and reset variables
+        board.innerHTML = '';
+        spaces = [];
+        path = [];
+        currentPosition = 0;
+        rolling = false;
+        rollResult.textContent = '';
+        overlay.style.display = 'none';
+        message.style.display = 'none';
+        playAgainButton.style.display = 'none';
+        playAgainButton.disabled = false;
+        rollButton.disabled = false;
+        rollButton.style.backgroundColor = "";
+        debugInput.value = '';
+        debugRoll = null;
+        debugMode = false;
         generateBoard();
         centerPlayer(true);
-      };
+      }
       rollButton.addEventListener('click', rollDie);
+      playAgainButton.addEventListener('click', () => {
+        resetGame();
+      });
       window.addEventListener('keydown', function(event) {
         if (event.key === 'd') {
           let password = prompt("Enter password");
@@ -327,6 +386,10 @@
           }
         }
       });
+      window.onload = function() {
+        generateBoard();
+        centerPlayer(true);
+      };
     </script>
   </body>
 </html>
