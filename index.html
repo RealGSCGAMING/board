@@ -164,7 +164,7 @@
           spaceDiv.classList.add('space');
           const row = Math.floor(i / boardSize);
           const col = i % boardSize;
-          const isEdge = row < 2 || row >= boardSize - 2 || col < 2 || col >= boardSize - 2;
+          const isEdge = row < 3 || row >= boardSize - 3 || col < 3 || col >= boardSize - 3;
           if (isEdge) {
             spaceDiv.classList.add('sand');
             sandTiles.push({
