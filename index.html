@@ -33,6 +33,7 @@
         margin-top: 10px;
         margin-left: 5px;
         margin-right: 5px;
+        transition: transform 0.1s;
       }
 
       #roll-button:hover {
@@ -111,14 +112,20 @@
         z-index: 5;
         display: none;
       }
+
+      #debug-input {
+        display: none;
+        margin-top: 10px;
+      }
     </style>
   </head>
   <body>
     <div id="left-panel">
       <h2>Generic Board Game (WIP)</h2>
       <p>Created by banana man</p>
-      <button id="roll-button">Roll Die</button>
+      <button id="roll-button">Roll</button>
       <div id="roll-result"></div>
+      <input type="number" id="debug-input" placeholder="Enter roll number">
     </div>
     <div id="board-container">
       <div id="board"></div>
@@ -136,9 +143,11 @@
       const board = document.getElementById('board');
       const overlay = document.getElementById('overlay');
       const message = document.getElementById('message');
+      const debugInput = document.getElementById('debug-input');
+      let debugMode = false;
+      let debugRoll = null;
 
       function generateBoard() {
-        // Create an empty grid
         for (let i = 0; i < boardSize * boardSize; i++) {
           let spaceDiv = document.createElement('div');
           spaceDiv.classList.add('space');
@@ -146,7 +155,6 @@
           board.appendChild(spaceDiv);
           spaces.push(spaceDiv);
         }
-        // Initialize the path and moveable spaces
         path = [];
         let visited = new Set();
         let startRow = Math.floor(Math.random() * boardSize);
@@ -158,7 +166,7 @@
           col: currentCol
         });
         visited.add(`${currentRow},${currentCol}`);
-        // Generate path ensuring only two adjacent moveable spaces
+
         function isValidMove(row, col) {
           let count = 0;
           if (visited.has(`${row - 1},${col}`)) count++;
@@ -199,18 +207,16 @@
             break;
           }
         }
-        // Mark moveable spaces and player position
         path.forEach(pos => {
           let index = pos.row * boardSize + pos.col;
           spaces[index].classList.remove('background');
           spaces[index].classList.add('moveable');
         });
         spaces[path[0].row * boardSize + path[0].col].classList.add('player');
-        // Add win space at the end of the path
         let winPos = path[path.length - 1];
         let winIndex = winPos.row * boardSize + winPos.col;
         spaces[winIndex].classList.add('win');
-        centerPlayer();
+        centerPlayer(true);
       }
 
       function rollDie() {
@@ -218,7 +224,7 @@
         rolling = true;
         rollButton.disabled = true;
         rollButton.style.backgroundColor = "grey";
-        let roll = Math.floor(Math.random() * 6) + 1;
+        let roll = debugRoll !== null ? debugRoll : Math.floor(Math.random() * 6) + 1;
         rollResult.textContent = roll;
         movePlayer(roll);
       }
@@ -226,41 +232,44 @@
       function movePlayer(roll) {
         let steps = 0;
         let moveInterval = setInterval(() => {
-          // Remove player from current position
           spaces[path[currentPosition].row * boardSize + path[currentPosition].col].classList.remove('player');
-          // Move to next position
           currentPosition++;
           if (currentPosition >= path.length) {
             currentPosition = path.length - 1;
           }
-          // Place player at new position
           spaces[path[currentPosition].row * boardSize + path[currentPosition].col].classList.add('player');
-          // Check for win condition
           if (spaces[path[currentPosition].row * boardSize + path[currentPosition].col].classList.contains('win')) {
             clearInterval(moveInterval);
             displayWin();
           }
           steps++;
-          // Stop moving after rolling steps
           if (steps >= roll) {
             clearInterval(moveInterval);
-            centerPlayer();
+            centerPlayer(false);
           }
         }, 300);
       }
 
-      function centerPlayer() {
+      function centerPlayer(instant) {
         let playerSpace = spaces[path[currentPosition].row * boardSize + path[currentPosition].col];
         let rect = playerSpace.getBoundingClientRect();
         let boardRect = board.getBoundingClientRect();
         let offsetX = boardRect.left - rect.left + (boardRect.width / 2) - (rect.width / 2);
         let offsetY = boardRect.top - rect.top + (boardRect.height / 2) - (rect.height / 2);
+        if (instant) {
+          board.style.transition = "none";
+        } else {
+          board.style.transition = "transform 0.5s ease";
+        }
         board.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
         setTimeout(() => {
           rolling = false;
           rollButton.disabled = false;
           rollButton.style.backgroundColor = "";
-        }, 600);
+          if (instant) {
+            board.style.transition = "transform 0.5s ease";
+          }
+        }, instant ? 0 : 600);
       }
 
       function displayWin() {
@@ -269,9 +278,24 @@
       }
       window.onload = function() {
         generateBoard();
-        centerPlayer(); // Center on player when page loads
+        centerPlayer(true);
       };
       rollButton.addEventListener('click', rollDie);
+      window.addEventListener('keydown', function(event) {
+        if (event.key === 'd') {
+          let password = prompt("Enter password");
+          if (password === "solsrngsucks") {
+            debugMode = true;
+            debugInput.style.display = 'block';
+            debugInput.addEventListener('input', function() {
+              debugRoll = parseInt(debugInput.value);
+              if (isNaN(debugRoll)) debugRoll = null;
+            });
+          } else {
+            alert("Incorrect password");
+          }
+        }
+      });
     </script>
   </body>
 </html>
