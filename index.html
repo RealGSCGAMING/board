@@ -11,6 +11,8 @@
         height: 100vh;
         margin: 0;
         font-family: Arial, sans-serif;
+        background-color: #87CEEB;
+        /* Blue background to resemble ocean */
       }
 
       #left-panel {
@@ -53,7 +55,6 @@
       #board-container {
         overflow: hidden;
         flex: 1;
-        background-color: green;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -73,12 +74,20 @@
       }
 
       .moveable {
-        background-color: white;
+        background-color: #d3d3d3;
+        /* Greyish color for path */
         border: 1px solid black;
       }
 
       .background {
         background-color: green;
+      }
+
+      .sand {
+        background-color: #F4A460;
+        /* Sand color */
+        border: none;
+        /* No outline for sand-colored tiles */
       }
 
       .player {
@@ -148,17 +157,35 @@
       let debugRoll = null;
 
       function generateBoard() {
+        let sandTiles = []; // Array to store sand tile positions
+        // Generate board with sand and non-sand tiles
         for (let i = 0; i < boardSize * boardSize; i++) {
           let spaceDiv = document.createElement('div');
           spaceDiv.classList.add('space');
-          spaceDiv.classList.add('background');
+          const row = Math.floor(i / boardSize);
+          const col = i % boardSize;
+          const isEdge = row < 2 || row >= boardSize - 2 || col < 2 || col >= boardSize - 2;
+          if (isEdge) {
+            spaceDiv.classList.add('sand');
+            sandTiles.push({
+              row,
+              col
+            }); // Store sand tile positions
+          } else {
+            spaceDiv.classList.add('background');
+          }
           board.appendChild(spaceDiv);
           spaces.push(spaceDiv);
         }
+        // Path generation ensuring no path tile on sand
         path = [];
         let visited = new Set();
         let startRow = Math.floor(Math.random() * boardSize);
         let startCol = Math.floor(Math.random() * boardSize);
+        while (sandTiles.some(tile => tile.row === startRow && tile.col === startCol)) {
+          startRow = Math.floor(Math.random() * boardSize);
+          startCol = Math.floor(Math.random() * boardSize);
+        }
         let currentRow = startRow;
         let currentCol = startCol;
         path.push({
@@ -168,6 +195,9 @@
         visited.add(`${currentRow},${currentCol}`);
 
         function isValidMove(row, col) {
+          if (sandTiles.some(tile => tile.row === row && tile.col === col)) {
+            return false; // Cannot move to sand tiles
+          }
           let count = 0;
           if (visited.has(`${row - 1},${col}`)) count++;
           if (visited.has(`${row + 1},${col}`)) count++;
@@ -207,9 +237,10 @@
             break;
           }
         }
+        // Update the board with path tiles
         path.forEach(pos => {
           let index = pos.row * boardSize + pos.col;
-          spaces[index].classList.remove('background');
+          spaces[index].classList.remove('background', 'sand');
           spaces[index].classList.add('moveable');
         });
         spaces[path[0].row * boardSize + path[0].col].classList.add('player');
