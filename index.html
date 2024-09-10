@@ -329,47 +329,40 @@
       }
 
       function movePlayer(roll) {
-        let steps = 0;
-        let previousPosition = currentPosition; // Track the previous position for passing check
-        let moveInterval = setInterval(() => {
-          spaces[path[previousPosition].row * boardSize + path[previousPosition].col].classList.remove('player');
-          // Move the player forward
-          currentPosition++;
-          if (currentPosition >= path.length) {
+    let steps = 0;
+    let previousPosition = currentPosition; // Track the previous position for passing check
+    let moveInterval = setInterval(() => {
+        spaces[path[previousPosition].row * boardSize + path[previousPosition].col].classList.remove('player');
+        // Move the player forward
+        currentPosition++;
+        if (currentPosition >= path.length) {
             clearInterval(moveInterval);
             displayWin();
             return;
-          }
-          // Update the player's position
-          spaces[path[currentPosition].row * boardSize + path[currentPosition].col].classList.add('player');
-          // Check if the player passed over a green space
-          if (spaces[path[previousPosition].row * boardSize + path[previousPosition].col].classList.contains('green')) {
-            playerMoney += 10; // Add $10 for passing over a green space
-            document.getElementById('money-counter').textContent = `Money: $${playerMoney}`;
-            // Show the message for passing
-            let previousSpace = spaces[path[previousPosition].row * boardSize + path[previousPosition].col];
-            let prevRect = previousSpace.getBoundingClientRect();
-            showMessage('Collected $10!', prevRect.left + prevRect.width / 2, prevRect.top + prevRect.height / 2);
-          }
-          // Stop after the player has moved the required number of spaces
-          steps++;
-          if (steps >= roll) {
+        }
+        // Update the player's position
+        spaces[path[currentPosition].row * boardSize + path[currentPosition].col].classList.add('player');
+
+        // Stop after the player has moved the required number of spaces
+        steps++;
+        if (steps >= roll) {
             clearInterval(moveInterval);
             // Check if the player landed on a green space
             if (spaces[path[currentPosition].row * boardSize + path[currentPosition].col].classList.contains('green')) {
-              playerMoney += 20;
-              document.getElementById('money-counter').textContent = `Money: $${playerMoney}`;
-              // Get player's current position on screen
-              let playerSpace = spaces[path[currentPosition].row * boardSize + path[currentPosition].col];
-              let rect = playerSpace.getBoundingClientRect();
-              // Show the message for landing
-              showMessage('Collected $20!', rect.left + rect.width / 2, rect.top + rect.height / 2);
+                playerMoney += 20;
+                document.getElementById('money-counter').textContent = `Money: $${playerMoney}`;
+                // Get player's current position on screen
+                let playerSpace = spaces[path[currentPosition].row * boardSize + path[currentPosition].col];
+                let rect = playerSpace.getBoundingClientRect();
+                // Show the message for landing
+                showMessage('Collected $20!', rect.left + rect.width / 2, rect.top + rect.height / 2);
             }
             centerPlayer(false);
-          }
-          previousPosition = currentPosition; // Update the previous position
-        }, 300);
-      }
+        }
+        previousPosition = currentPosition; // Update the previous position
+    }, 300);
+}
+
 
       function centerPlayer(instant) {
         let playerSpace = spaces[path[currentPosition].row * boardSize + path[currentPosition].col];
