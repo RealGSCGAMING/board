@@ -203,8 +203,8 @@
     <div id="board-container">
       <div id="board"></div>
       <div id="overlay">
-        <div id="message">You Win! <p></p>
-          <button id="play-again-button">Play Again</button>
+        <div id="message">Board Clear! <p></p>
+          <button id="play-again-button">Next Board</button>
         </div>
       </div>
     </div>
@@ -417,21 +417,21 @@
 
       function startPlayAgainTimer() {
         let timeLeft = 2;
-        playAgainButton.textContent = `Play Again (${timeLeft})`;
+        playAgainButton.textContent = `Next Board (${timeLeft})`;
         playAgainButton.disabled = true;
         playAgainButton.style.backgroundColor = "grey";
         playAgainTimer = setInterval(() => {
           timeLeft--;
           if (timeLeft <= 0) {
             clearInterval(playAgainTimer);
-            playAgainButton.textContent = "Play Again";
+            playAgainButton.textContent = "Next Board";
             playAgainButton.disabled = false;
             playAgainButton.style.backgroundColor = "";
             if (autoPlay) {
               resetGame();
             }
           } else {
-            playAgainButton.textContent = `Play Again (${timeLeft})`;
+            playAgainButton.textContent = `Next Board (${timeLeft})`;
           }
         }, 1000);
       }
@@ -450,9 +450,6 @@
         playAgainButton.disabled = false;
         rollButton.disabled = false;
         rollButton.style.backgroundColor = "";
-        debugInput.value = '';
-        debugRoll = null;
-        debugMode = false;
         generateBoard();
         centerPlayer(true);
       }
