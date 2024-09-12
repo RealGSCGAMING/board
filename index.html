@@ -508,6 +508,8 @@
         overlay.style.display = 'flex';
         message.style.display = 'block';
         playAgainButton.style.display = 'inline-block';
+        boards++;
+        saveGameState();
         startPlayAgainTimer();
       }
 
@@ -546,7 +548,6 @@
         playAgainButton.disabled = false;
         rollButton.disabled = false;
         rollButton.style.backgroundColor = "";
-        boards++;
         document.getElementById('board-counter').textContent = `Boards: ${boards}`;
         generateBoard();
         centerPlayer(true);
@@ -571,8 +572,17 @@
         }
       });
       window.onload = function() {
-        generateBoard();
-        centerPlayer(true);
+        let savedState = getCookie('gameState');
+        if (savedState) {
+          playerMoney = savedState.money || 50;
+          playerCards = savedState.cards || 1;
+          boards = savedState.boards || 0;
+          // Update the UI with restored values
+          document.getElementById('money-counter').textContent = `Money: $${playerMoney}`;
+          document.getElementById('card-counter').textContent = `Cards: ${playerCards}`;
+          document.getElementById('board-counter').textContent = `Boards: ${boards}`;
+        }
+        generateBoard(); // Generate the board
       };
       const autoButton = document.getElementById('auto-button');
       let autoPlay = false;
@@ -652,6 +662,64 @@
       drawCardButton.addEventListener('click', drawCard);
       document.getElementById('debug-input').addEventListener('click', function(e) {
         e.stopPropagation(); // Stop the event from propagating to the parent button
+      });
+
+      function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+          let date = new Date();
+          date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+          expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (btoa(JSON.stringify(value)) || "") + expires + "; path=/";
+      }
+
+      function getCookie(name) {
+        let nameEQ = name + "=";
+        let ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+          let c = ca[i];
+          while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+          if (c.indexOf(nameEQ) == 0) return JSON.parse(atob(c.substring(nameEQ.length, c.length)));
+        }
+        return null;
+      }
+
+      function deleteCookie(name) {
+        document.cookie = name + "=; Max-Age=-99999999;";
+      }
+
+      function saveGameState() {
+        const gameState = {
+          money: playerMoney,
+          cards: playerCards,
+          boards: boards
+        };
+        setCookie('gameState', gameState, 999); // Save for 30 days
+      }
+
+      function clearGame() {
+        deleteCookie('gameState');
+        playerMoney = 50;
+        playerCards = 1;
+        boards = 0;
+        // Update the UI with default values
+        document.getElementById('money-counter').textContent = `Money: $${playerMoney}`;
+        document.getElementById('card-counter').textContent = `Cards: ${playerCards}`;
+        document.getElementById('board-counter').textContent = `Boards: ${boards}`;
+        alert('Game reset successfully.');
+        location.reload();
+      }
+      document.addEventListener('keydown', function(event) {
+        if (event.code === 'KeyR') {
+          // Show prompt asking for reset
+          let userInput = prompt('*THIS WILL CLEAR ALL OF YOUR DATA!!!* To reset your game, type "reset" in the box below:');
+          // Check if the user typed 'reset'
+          if (userInput === 'reset') {
+            clearGame(); // Call the reset game function
+            location.reload(); // Reload the page
+          }
+        }
       });
     </script>
   </body>
