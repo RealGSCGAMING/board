@@ -40,7 +40,7 @@
       }
 
       #roll-button {
-        font-size: 2em;
+        font-size: 1.5em;
       }
 
       #roll-button:hover,
@@ -150,7 +150,7 @@
         margin-left: 5px;
         margin-right: 5px;
         transition: transform 0.1s;
-        font-size: 2em;
+        font-size: 1.5em;
       }
 
       #auto-button.active {
@@ -213,7 +213,7 @@
         margin-left: 5px;
         margin-right: 5px;
         transition: transform 0.1s;
-        font-size: 2em;
+        font-size: 1.5em;
       }
 
       #draw-card-button:hover {
@@ -279,6 +279,7 @@
       <div id="left-box">
         <div id="money-counter">Money: $50</div>
         <div id="card-counter">Cards: 1</div>
+        <div id="board-counter">Boards: 0</div>
       </div>
       <button id="roll-button">Roll <input type="text" id="debug-input" placeholder="Force Number" style="display: none;">
       </button>
@@ -319,6 +320,7 @@
       let debugRoll = null;
       let playAgainTimer = null;
       let playerMoney = 50;
+      let boards = 0;
 
       function generateBoard() {
         board.innerHTML = ''; // Clear the existing board
@@ -544,6 +546,8 @@
         playAgainButton.disabled = false;
         rollButton.disabled = false;
         rollButton.style.backgroundColor = "";
+        boards++;
+        document.getElementById('board-counter').textContent = `Boards: ${boards}`;
         generateBoard();
         centerPlayer(true);
       }
