@@ -275,7 +275,8 @@
   </head>
   <body>
     <div id="left-panel">
-      <h1>Generic Board Game</h1>
+      <h2>Generic Board Game</h2>
+      <p style="margin:0">This game likely will not be updated.</p>
       <div id="left-box">
         <div id="money-counter">Money: $50</div>
         <div id="card-counter">Cards: 1</div>
@@ -298,7 +299,7 @@
     <div id="board-container">
       <div id="board"></div>
       <div id="overlay">
-        <div id="message">Board Clear! <p>Your data has been saved.</p>
+        <div id="message">Board Clear! <p></p>
           <button id="play-again-button">Next Board</button>
         </div>
       </div>
@@ -575,7 +576,7 @@
         let savedState = getCookie('gameState');
         if (savedState) {
           playerMoney = savedState.money || 50;
-          playerCards = savedState.cards || 1;
+          playerCards = savedState.cards || 0;
           boards = savedState.boards || 0;
           // Update the UI with restored values
           document.getElementById('money-counter').textContent = `Money: $${playerMoney}`;
@@ -701,7 +702,7 @@
       function clearGame() {
         deleteCookie('gameState');
         playerMoney = 50;
-        playerCards = 1;
+        playerCards = 0;
         boards = 0;
         // Update the UI with default values
         document.getElementById('money-counter').textContent = `Money: $${playerMoney}`;
